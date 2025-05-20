@@ -9,8 +9,13 @@ namespace proyectord
 {
     internal class Program
     {
-       
-
+        public enum Menu
+        {
+            consultar = 1, Depositar, Retirar
+        }
+        static double saldo = 0;
+        static Dictionary<DateTime, double> depositos = new Dictionary<DateTime, double>();
+        static Dictionary<DateTime, double> retiros = new Dictionary<DateTime, double>();
         static void Main(string[] args)
         {
             int intentos = 3;
@@ -21,7 +26,19 @@ namespace proyectord
                     Console.WriteLine("Bienvenido");
                     while (true)
                     {
-                        
+                        switch (men())
+                        {
+                            case Menu.consultar:
+                                Console.WriteLine($"Tu saldo es{saldo}");
+                                break;
+                            case Menu.Depositar:
+                                Console.WriteLine("cantidad a depositar");
+                                double dep = Convert.ToDouble(Console.ReadLine());
+                                saldo += dep;
+                                break;
+
+
+                        }
                     }
                 }
                 else
@@ -29,14 +46,14 @@ namespace proyectord
                     intentos--;
                     Console.WriteLine($"Fallaste te quedan {intentos} ");
                 }
-                if (intentos==0)
+                if (intentos == 0)
                 {
                     Console.WriteLine("No te quedan intentos");
                     Console.ReadKey();
                     Environment.Exit(1);
                 }
             }
-            while (intentos >=0);
+            while (intentos >= 0);
         }
 
         static bool loggin()
@@ -44,9 +61,9 @@ namespace proyectord
             DateTime fechaact = DateTime.Now;
 
             Console.WriteLine("User");
-            string user=Console.ReadLine();
+            string user = Console.ReadLine();
             Console.WriteLine("Password");
-            string  password = Console.ReadLine();
+            string password = Console.ReadLine();
             Console.WriteLine("Fecha de nacimiento");
             DateTime fechadenacimiento = Convert.ToDateTime(Console.ReadLine());
             int edad = fechaact.Year - fechadenacimiento.Year;
@@ -60,6 +77,17 @@ namespace proyectord
                 return false;
             }
         }
-
+        static Menu men()
+        {
+            Console.WriteLine("1) Consultar saldo actual");
+            Console.WriteLine("2) Depositar dinero");
+            Console.WriteLine("3) Retirar dinero");
+            Console.WriteLine("4) Consultar historial de depósito");
+            Console.WriteLine("5) Consultar historial de retiros");
+            Console.WriteLine("6) Salir");
+            Console.Write("Selecciona una opción: ");
+            Menu opc = (Menu)Convert.ToInt32(Console.ReadLine());
+            return opc;
+        }
     }
 }
