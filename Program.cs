@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace proyectord
     {
         public enum Menu
         {
-            consultar = 1, Depositar, Retirar
+            consultar = 1, Depositar, Retirar, HistorialDepositos, HistorialRetiros, Salir
         }
         static double saldo = 0;
         static Dictionary<DateTime, double> depositos = new Dictionary<DateTime, double>();
@@ -23,21 +25,68 @@ namespace proyectord
             {
                 if (loggin())
                 {
-                    Console.WriteLine("Bienvenido");
+                    Console.WriteLine("Bienvenido al Banco PNDAX");
                     while (true)
                     {
                         switch (men())
                         {
                             case Menu.consultar:
-                                Console.WriteLine($"Tu saldo es{saldo}");
+                                Console.WriteLine($"Tu saldo es de : {saldo} ");
                                 break;
                             case Menu.Depositar:
                                 Console.WriteLine("cantidad a depositar");
                                 double dep = Convert.ToDouble(Console.ReadLine());
                                 saldo += dep;
+                                DateTime fechaDeposito = DateTime.Now;
+                                depositos.Add(fechaDeposito, dep);
+                                Console.WriteLine($" Depósito de $ {dep} realizado con éxito.");
+
+                                enviarComprobante("Depósito", fechaDeposito, dep);
+
                                 break;
 
+                            case Menu.Retirar:
+                                Console.Write("Ingresa la cantidad a retirar: ");
+                                double retiro = Convert.ToDouble(Console.ReadLine());
 
+                                if (retiro <= saldo)
+                                {
+                                    saldo -= retiro;
+                                    DateTime fechaRetiro = DateTime.Now;
+                                    retiros.Add(fechaRetiro, retiro);
+                                    Console.WriteLine($" Retiro de ${retiro} realizado con éxito.");
+
+                                    enviarComprobante("Retiro", fechaRetiro, retiro);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(" Fondos insuficientes.");
+                                }
+                                break;
+
+                            case Menu.HistorialDepositos:
+                                Console.WriteLine(" Historial de Depósitos:");
+                                foreach (var item in depositos)
+                                {
+                                    Console.WriteLine($" - {item.Key}: ${item.Value}");
+                                }
+                                break;
+
+                            case Menu.HistorialRetiros:
+                                Console.WriteLine(" Historial de Retiros:");
+                                foreach (var item in retiros)
+                                {
+                                    Console.WriteLine($" - {item.Key}: ${item.Value}");
+                                }
+                                break;
+
+                            case Menu.Salir:
+                                Console.WriteLine(" Gracias por usar el Banco PNDAX. Hasta luego.");
+                                return;
+
+                            default:
+                                Console.WriteLine(" Opción inválida -Elije una opción del 1-6-");
+                                break;
                         }
                     }
                 }
@@ -89,5 +138,47 @@ namespace proyectord
             Menu opc = (Menu)Convert.ToInt32(Console.ReadLine());
             return opc;
         }
+
+        static void enviarComprobante(string tipo, DateTime fecha, double monto)
+        {
+            Console.Write("¿Deseas recibir un comprobante por correo? (s/n): ");
+            string respuesta = Console.ReadLine().ToLower();
+
+            if (respuesta == "s")
+            {
+                EnviarComprobantePorCorreo(tipo, fecha, monto);
+            }
+        }
+        static void EnviarComprobantePorCorreo(string tipo, DateTime fecha, double monto)
+        {
+            string remitente = "113449@alumnouninter.mx";
+            string contraseña = "Lkjhmn27";
+            string destinatario = "dianegh22@gmail.com";
+
+            StringBuilder cuerpo = new StringBuilder();
+            cuerpo.AppendLine(" Comprobante de transacción");
+            cuerpo.AppendLine($"Tipo de operación: {tipo}");
+            cuerpo.AppendLine($"Monto: ${monto}");
+            cuerpo.AppendLine($"Fecha y hora: {fecha}");
+
+            MailMessage mensaje = new MailMessage(remitente, destinatario, $"Comprobante de {tipo}", cuerpo.ToString());
+
+            SmtpClient cliente = new SmtpClient("smtp.office365.com", 587)
+            {
+                Credentials = new NetworkCredential(remitente, contraseña),
+                EnableSsl = true
+            };
+
+            try
+            {
+                cliente.Send(mensaje);
+                Console.WriteLine("Comprobante enviado exitosamente al correo.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" Error al enviar el comprobante: " + ex.Message);
+            }
+        }
+
     }
 }
