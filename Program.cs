@@ -25,63 +25,32 @@ namespace proyectord
             {
                 if (loggin())
                 {
-                    Console.WriteLine("Bienvenido al Banco PNDAX");
+                    Console.WriteLine("---- Bienvenido al Banco PNDAX ----");
                     while (true)
                     {
                         switch (men())
                         {
                             case Menu.consultar:
-                                Console.WriteLine($"Tu saldo es de : {saldo} ");
+                                Console.WriteLine($"Tu saldo actual es de : {saldo} ");
                                 break;
                             case Menu.Depositar:
-                                Console.WriteLine("cantidad a depositar");
-                                double dep = Convert.ToDouble(Console.ReadLine());
-                                saldo += dep;
-                                DateTime fechaDeposito = DateTime.Now;
-                                depositos.Add(fechaDeposito, dep);
-                                Console.WriteLine($" Depósito de $ {dep} realizado con éxito.");
-
-                                enviarComprobante("Depósito", fechaDeposito, dep);
-
+                                Depositar();
                                 break;
 
                             case Menu.Retirar:
-                                Console.Write("Ingresa la cantidad a retirar: ");
-                                double retiro = Convert.ToDouble(Console.ReadLine());
-
-                                if (retiro <= saldo)
-                                {
-                                    saldo -= retiro;
-                                    DateTime fechaRetiro = DateTime.Now;
-                                    retiros.Add(fechaRetiro, retiro);
-                                    Console.WriteLine($" Retiro de ${retiro} realizado con éxito.");
-
-                                    enviarComprobante("Retiro", fechaRetiro, retiro);
-                                }
-                                else
-                                {
-                                    Console.WriteLine(" Fondos insuficientes.");
-                                }
+                                retirar();
                                 break;
 
                             case Menu.HistorialDepositos:
-                                Console.WriteLine(" Historial de Depósitos:");
-                                foreach (var item in depositos)
-                                {
-                                    Console.WriteLine($" - {item.Key}: ${item.Value}");
-                                }
+                                historialdep();
                                 break;
 
                             case Menu.HistorialRetiros:
-                                Console.WriteLine(" Historial de Retiros:");
-                                foreach (var item in retiros)
-                                {
-                                    Console.WriteLine($" - {item.Key}: ${item.Value}");
-                                }
+                               historialrep();  
                                 break;
 
                             case Menu.Salir:
-                                Console.WriteLine(" Gracias por usar el Banco PNDAX. Hasta luego.");
+                                salir();
                                 return;
 
                             default:
@@ -93,7 +62,7 @@ namespace proyectord
                 else
                 {
                     intentos--;
-                    Console.WriteLine($"Fallaste te quedan {intentos} ");
+                    Console.WriteLine($"Fallaste te quedan {intentos} intentos ");
                 }
                 if (intentos == 0)
                 {
@@ -113,7 +82,7 @@ namespace proyectord
             string user = Console.ReadLine();
             Console.WriteLine("Password");
             string password = Console.ReadLine();
-            Console.WriteLine("Fecha de nacimiento");
+            Console.WriteLine("Fecha de nacimiento dd/MM/yyyy");
             DateTime fechadenacimiento = Convert.ToDateTime(Console.ReadLine());
             int edad = fechaact.Year - fechadenacimiento.Year;
 
@@ -156,7 +125,7 @@ namespace proyectord
             string destinatario = "dianegh22@gmail.com";
 
             StringBuilder cuerpo = new StringBuilder();
-            cuerpo.AppendLine(" Comprobante de transacción");
+            cuerpo.AppendLine("----- Comprobante de transacción ------");
             cuerpo.AppendLine($"Tipo de operación: {tipo}");
             cuerpo.AppendLine($"Monto: ${monto}");
             cuerpo.AppendLine($"Fecha y hora: {fecha}");
@@ -178,6 +147,61 @@ namespace proyectord
             {
                 Console.WriteLine(" Error al enviar el comprobante: " + ex.Message);
             }
+        }
+
+        static void retirar()
+        {
+            Console.Write("Ingresa la cantidad a retirar: ");
+            double retiro = Convert.ToDouble(Console.ReadLine());
+
+            if (retiro <= saldo)
+            {
+                saldo -= retiro;
+                DateTime fechaRetiro = DateTime.Now;
+                retiros.Add(fechaRetiro, retiro);
+                Console.WriteLine($" Retiro de ${retiro} realizado con éxito.");
+
+                enviarComprobante("Retiro", fechaRetiro, retiro);
+            }
+            else
+            {
+                Console.WriteLine(" Fondos insuficientes.");
+            }
+
+        }
+
+        static void Depositar()
+        {
+            Console.WriteLine("Cantidad a depositar");
+            double dep = Convert.ToDouble(Console.ReadLine());
+            saldo += dep;
+            DateTime fechaDeposito = DateTime.Now;
+            depositos.Add(fechaDeposito, dep);
+            Console.WriteLine($" Depósito de $ {dep} realizado con éxito.");
+
+            enviarComprobante("Depósito", fechaDeposito, dep);
+        }
+
+        static void historialdep()
+        {
+            Console.WriteLine(" Historial de Depósitos:");
+            foreach (var item in depositos)
+            {
+                Console.WriteLine($" - {item.Key}: ${item.Value}");
+            }
+        }
+        static void historialrep()
+        {
+            Console.WriteLine(" Historial de Retiros:");
+            foreach (var item in retiros)
+            {
+                Console.WriteLine($" - {item.Key}: ${item.Value}");
+            }
+        }
+
+        static void salir()
+        {
+            Environment.Exit(0);
         }
 
     }
