@@ -13,7 +13,7 @@ namespace proyectord
     {
         public enum Menu
         {
-            consultar = 1, Depositar, Retirar, HistorialDepositos, HistorialRetiros, Salir
+            consultar = 1, Depositar, Retirar, HistorialDepositos, HistorialRetiros, Salir ,Deprep
         }
         static double saldo = 0;
         static Dictionary<DateTime, double> depositos = new Dictionary<DateTime, double>();
@@ -52,6 +52,10 @@ namespace proyectord
                             case Menu.Salir:
                                 salir();
                                 return;
+
+                            case Menu.Deprep:
+                                deprep();
+                                break;
 
                             default:
                                 Console.WriteLine(" Opción inválida -Elije una opción del 1-6-");
@@ -103,6 +107,7 @@ namespace proyectord
             Console.WriteLine("4) Consultar historial de depósito");
             Console.WriteLine("5) Consultar historial de retiros");
             Console.WriteLine("6) Salir");
+            Console.WriteLine("7) Depositos o Retiros");
             Console.Write("Selecciona una opción: ");
             Menu opc = (Menu)Convert.ToInt32(Console.ReadLine());
             return opc;
@@ -202,6 +207,22 @@ namespace proyectord
         static void salir()
         {
             Environment.Exit(0);
+        }
+
+        static void deprep()
+        {
+            Console.WriteLine($"depositos: {depositos.Count}");
+            Console.WriteLine($"retiros: {retiros.Count}");
+
+            if ( depositos.Count > retiros.Count)
+            {
+                Console.WriteLine("Hay mas depositos");
+            }
+            else
+            {
+                Console.WriteLine("Hay más retiros");
+            }
+        
         }
 
     }
